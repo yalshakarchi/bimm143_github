@@ -1,0 +1,353 @@
+---
+title: "Class 14: RNASeq Mini-Project"
+author: "Yasmeen Al Shakarchi (PID: A18116120)"
+format: pdf
+---
+
+
+## Background
+
+The data for today's mini-project comes from a knock-down study of an important HOX gene. 
+
+
+
+## Data Import
+
+```{r}
+countData <- read.csv("GSE37704_featurecounts.csv", row.names=1)
+colData <- read.csv("GSE37704_metadata.csv", row.names = 1)
+```
+
+Have a wee peak at these: 
+
+```{r}
+colData
+```
+
+
+```{r}
+head(countData)
+```
+
+
+### Clean up (data tidying)
+
+We need to remove the funny "length" column from our `countData` to make the columns match the rows in `colData`. 
+
+```{r}
+countData <-  countData[,-1]
+```
+
+Check match of `colData` and `countData` 
+
+```{r}
+rownames(colData) == colnames(countData)
+```
+
+
+
+## DESeq Analysis
+```{r, message=FALSE}
+library(DESeq2)
+
+```
+
+
+```{r}
+head(countData)
+```
+
+### Remove zero count genes
+
+
+```{r}
+to.keep <- rowSums(countData) > 0
+countData <- countData[to.keep,]
+```
+
+> Q. What will rowSums() of countData return and how could you use it in this context?
+
+Answer: It shows us the sum of all values for each row and in this context it shows us the counts of each genes and filters out the genes that are zero (no expression).  
+
+
+## Setting up the DESeq object 
+
+
+```{r}
+dds <- DESeqDataSetFromMatrix(countData= countData,
+                             colData= colData,
+                             design=~condition)
+```
+
+
+
+
+## Running DESeq 
+
+```{r}
+dds <- DESeq(dds)
+dds
+```
+##getting reuslts 
+
+
+```{r}
+res = results(dds)
+head(res)
+```
+> Q. Q. Call the summary() function on your results to get a sense of how many genes are up or down-regulated at the default 0.1 p-value cutoff.
+
+```{r}
+summary(res)
+```
+
+
+## Volcano Plot
+
+A plot of log2 fold change vs -log of Adjusted P-value.
+
+
+```{r}
+library(ggplot2)
+```
+
+
+```{r}
+ggplot(res) +
+aes(log2FoldChange,
+padj) +
+geom_point()
+```
+
+
+
+```{r}
+ggplot(res) +
+aes(log2FoldChange,
+log(padj)) +
+geom_point()
+```
+
+
+
+```{r}
+ggplot(res) +
+aes(log2FoldChange,
+- log(padj)) +
+geom_point() +
+geom_vline(xintercept = c(-2, +2), col="red") +
+geom_hline(yintercept = -log(0.01), col="red")
+```
+
+
+
+```{r}
+mycols <- rep("grey", nrow(res))
+mycols[res$log2FoldChange > 2] <- "purple"
+mycols[res$log2FoldChange < -2] <- "pink"
+mycols[res$padj >= 0.01] <- "grey"
+```
+
+
+```{r}
+ggplot(res) +
+aes(x= log2FoldChange,
+y= - log(padj)) +
+geom_point(col=mycols) +
+geom_vline(xintercept = c(-2, +2), col="red") +
+geom_hline(yintercept = -log(0.01), col="red")
+```
+
+
+
+## Add Annotation 
+
+```{r}
+library(AnnotationDbi)
+library(org.Hs.eg.db)
+```
+
+```{r}
+columns(org.Hs.eg.db)
+```
+
+```{r}
+res$symbol = mapIds(org.Hs.eg.db,
+                    keys=rownames(res), 
+                    keytype="ENSEMBL",
+                    column="SYMBOL",
+                    multiVals="first")
+```
+
+```{r}
+head(res)
+```
+
+```{r}
+res$entrez <- mapIds(org.Hs.eg.db,
+keys = rownames(res), 
+keytype = "ENSEMBL", 
+column = "ENTREZID")
+```
+```{r}
+head(res)
+```
+
+```{r}
+res$name <- mapIds(org.Hs.eg.db,
+keys = rownames(res), 
+keytype = "ENSEMBL", 
+column = "GENENAME")
+```
+
+```{r}
+head(res, 10)
+```
+
+```{r}
+write.csv(res, file="results_annotated.csv")
+```
+
+
+## Pathway Analysis
+
+We need a foldchange vector for `gage()`
+
+
+
+```{r, message=FALSE}
+library(pathview)
+library(gage)
+library(gageData)
+
+data(kegg.sets.hs)
+data(sigmet.idx.hs)
+
+kegg.sets.hs = kegg.sets.hs[sigmet.idx.hs]
+
+head(kegg.sets.hs, 3)
+```
+```{r}
+foldchanges = res$log2FoldChange
+names(foldchanges) = res$entrez
+head(foldchanges)
+```
+
+### KEGG
+
+```{r}
+keggres = gage(foldchanges, gsets=kegg.sets.hs)
+```
+
+```{r}
+attributes(keggres)
+```
+
+```{r}
+head(keggres$less)
+```
+
+
+Now, let's try out the pathview() function from the pathview package to make a pathway plot with our RNA-Seq expression results shown in color.
+To begin with lets manually supply a pathway.id (namely the first part of the "hsa04110 Cell cycle") that we could see from the print out above.
+
+
+```{r}
+pathview(gene.data=foldchanges, pathway.id="hsa04110")
+```
+![](hsa04110.pathview.png)
+
+
+```{r}
+pathview(gene.data=foldchanges, pathway.id="hsa04110", kegg.native=FALSE)
+```
+![](hsa04110.pathview.pdf)
+
+
+DEMO:
+
+```{r}
+keggrespathways <- rownames(keggres$greater)[1:5]
+```
+
+```{r}
+keggresids = substr(keggrespathways, start=1, stop=8)
+keggresids
+```
+
+
+```{r}
+pathview(gene.data=foldchanges, pathway.id=keggresids, species="hsa")
+```
+
+![](hsa04640.pathview.png)
+![](hsa04630.pathview.png)
+![](hsa00140.pathview.png)
+![](hsa04142.pathview.png)
+![](hsa04330.pathview.png)
+
+
+## GO
+
+```{r}
+data(go.sets.hs)
+data(go.subs.hs)
+
+gobpsets = go.sets.hs[go.subs.hs$BP]
+
+gobpres = gage(foldchanges, gsets=gobpsets)
+
+lapply(gobpres, head)
+```
+
+
+### Reactome
+
+
+```{r}
+sig_genes <- res[res$padj <= 0.05 & !is.na(res$padj), "symbol"]
+print(paste("Total number of significant genes:", length(sig_genes)))
+```
+
+
+```{r}
+write.table(sig_genes, file="significant_genes.txt", row.names=FALSE, col.names=FALSE, quote=FALSE)
+```
+
+
+
+> Q: What pathway has the most significant “Entities p-value”? Do the most significant pathways listed match your previous KEGG results? What factors could cause differences between the two methods?
+
+
+Answer: The most significant "Entities p-value" is in Cell Cycle, Mitotic. Yes it matches my KEGG result. Something that can cause it to be different is that the databases can be different (annotated differently/ filtered differently) causing it to not have the same exact file ( therefore not same output). 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
