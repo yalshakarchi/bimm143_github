@@ -27,7 +27,7 @@ Class 13 [DESeq lab](class13/class13.md)
 
 Class 14 [DESeq2 mini project](class14/class14.md)
 
-Class 16 [Unix Basics](class16/class16.pdf)
+Class 16 [Unix Basics](class16/class16_16.pdf)
 
 Class 17 [Analyzing sequencing data in the cloud](class17/class17.md)
 
