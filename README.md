@@ -36,5 +36,3 @@ Class 18 [Pertussis Resurgence (mini-project)](class18/class18.md)
 
 
 
-
-
