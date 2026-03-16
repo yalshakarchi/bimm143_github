@@ -1,0 +1,329 @@
+---
+title: "Class 17"
+format: pdf
+execute:
+  working-directory: /Users/yasoohaitham
+---
+
+```{r}
+ getwd()
+```
+
+
+
+
+```{r}
+path.expand("~/Downloads")
+```
+
+
+
+```{r}
+list.files(path.expand("/Users/yasoohaitham/Downloads"))
+```
+
+
+
+```{r}
+samples <- data.frame(
+  row.names = c("SRR2156848", "SRR2156849", "SRR2156850", "SRR2156851"),
+  condition = c("control","control","treated","treated")
+)
+```
+
+
+```{r}
+library(tximport)
+
+quant_dirs <- c(
+  "/Users/yasoohaitham/Downloads/SRR2156848_quant/abundance.h5",
+  "/Users/yasoohaitham/Downloads/SRR2156849_quant/abundance.h5",
+  "/Users/yasoohaitham/Downloads/SRR2156850_quant/abundance.h5",
+  "/Users/yasoohaitham/Downloads/SRR2156851_quant/abundance.h5"
+)
+
+txi <- tximport(
+  files = quant_dirs,
+  type  = "kallisto",
+  txOut = TRUE
+)
+
+names(txi)
+```
+
+
+```{r}
+library(DESeq2)
+
+dds <- DESeqDataSetFromTximport(
+  txi      = txi,
+  colData  = samples,
+  design   = ~ condition
+)
+
+dds
+```
+
+```{r}
+vsd <- varianceStabilizingTransformation(dds)
+vst_mat <- assay(vsd)
+```
+```{r}
+nonzero <- apply(vst_mat, 1, var) > 0
+vst_filt <- vst_mat[nonzero, ]
+```
+
+```{r}
+pca <- prcomp(t(vst_filt), scale = TRUE)
+pca
+```
+```{r}
+df <- as.data.frame(pca$x)
+df$sample <- rownames(df)
+df$condition <- samples$condition
+df
+```
+
+
+
+
+```{r}
+list.files(path.expand("~/Downloads"), pattern = "SRR")
+```
+
+
+
+```{r}
+samples <- data.frame(
+  sample = c("SRR2156848", "SRR2156849", "SRR2156850", "SRR2156851"),
+  condition = c("control", "control", "treated", "treated")
+)
+samples
+```
+
+
+
+```{r}
+quant_dirs <- c(
+  "~/Downloads/SRR2156848_quant/quant.sf",
+  "~/Downloads/SRR2156849_quant/quant.sf",
+  "~/Downloads/SRR2156850_quant/quant.sf",
+  "~/Downloads/SRR2156851_quant/quant.sf"
+)
+
+quant_dirs
+```
+
+```{r}
+list.files("/Users/yasoohaitham/Downloads", pattern="SRR", full.names=TRUE)
+```
+
+```{r}
+quant_dirs <- c(
+  "/Users/yasoohaitham/Downloads/SRR2156848_quant/quant.sf",
+  "/Users/yasoohaitham/Downloads/SRR2156849_quant/quant.sf",
+  "/Users/yasoohaitham/Downloads/SRR2156850_quant/quant.sf",
+  "/Users/yasoohaitham/Downloads/SRR2156851_quant/quant.sf"
+)
+
+file.exists(quant_dirs)
+```
+
+
+
+```{r}
+library(DESeq2)
+
+samples <- data.frame(
+  row.names = c("SRR2156848", "SRR2156849", "SRR2156850", "SRR2156851"),
+  condition = c("control", "control", "treated", "treated")
+)
+
+dds <- DESeqDataSetFromTximport(
+  txi      = txi,
+  colData  = samples,
+  design   = ~ condition
+)
+
+dds
+```
+
+
+
+```{r}
+df <- as.data.frame(pca$x)
+df$sample <- rownames(df)
+df$condition <- c("control","control","treated","treated")
+
+head(df)
+```
+
+
+```{r}
+setwd("~/Downloads")
+```
+
+setwd("~/Downloads")
+
+## Core Unix commands
+Most unix commands have super short names, which makes them quick to type but annoying to learn. Major file system related commands include:
+
+pwd: Print working directory 
+ls: list files and directories 
+cd: Change Directory
+mkdir: Make a new directory rm: remove files and directory (delete)
+ср: Copy files or dirs (source > destination) 
+mv: Move files or dirs (basically re-name)
+nano: A wee text editor (very basic but always available)
+
+curl: Download files from web or ftp 
+wet: Download files from the web 
+tar -zxvf: UnTar (unpackage) Tar archive files 
+gunzip: UnZip files
+$PATH: The places (dirs) to look for programs
+
+
+## AWS EC2 Instance
+
+
+ssh -i ~/Downloads/bimm143_ya.pem ubuntu@ec2-34-222-197-175.us-west-2.compute.amazonaws.com
+ssh -i "bioinf_yasmeen.pem" ubuntu@ec2-34-222-197-175.us-west-2.compute.amazonaws.com
+ssh -i  ~/Downloads/bioinf_yasmeen.pem ubuntu@ec2-34-222-197-175.us-west-2.compute.amazonaws.com
+
+Secure Copy files between machines, in this case from our instance to our laptop
+scp -i ~/Downloads/bioinf_yasmeen.pem ubuntu@ec2-16-145-48-135.us-west-2.compute.amazonaws.com:~/results.tsv . 
+
+
+
+## Class 17 Instance 
+ssh -i  ~/Downloads/bioinf_yasmeen.pem ubuntu@ec2-34-222-197-175.us-west-2.compute.amazonaws.com
+
+export KEY=~/Downloads/bioinf_yasmeen.pem
+
+export SERVER=ubuntu@ec2-34-210-54-74.us-west-2.compute.amazonaws.com
+
+ssh -i $KEY $SERVER
+scp -r -i $KEY $SERVER:~/*_quant .cd ~/Downloads
+
+>Q1: What command prints the first lines of a FASTQ file?
+
+head SRR2156848_1.fastq
+
+>Q2: How to count the number of reads?
+
+grep -c "^@" SRR2156848_1.fastqhead SRR2156848_1.fastq
+
+
+
+
+```{r}
+library(ggplot2)
+
+df <- as.data.frame(pca$x)
+df$sample <- rownames(df)
+df$condition <- c("control","control","treated","treated")
+
+```
+
+
+
+```{r}
+ggplot(df, aes(PC1, PC2, color=condition)) +
+  geom_point(size=4) +
+  theme_minimal() +
+  labs(title="PC1 vs PC2")
+
+```
+
+
+```{r}
+ggplot(df, aes(PC1, PC3, color=condition)) +
+  geom_point(size=4) +
+  theme_minimal() +
+  labs(title="PC1 vs PC3")
+```
+
+```{r}
+ggplot(df, aes(PC2, PC3, color=condition)) +
+  geom_point(size=4) +
+  theme_minimal() +
+  labs(title="PC2 vs PC3")
+
+```
+
+
+```{r}
+plot(pca$x[,1], pca$x[,3],
+     col=c("blue","blue","red","red"),
+     xlab="PC1", ylab="PC3", pch=16)
+```
+
+
+
+```{r}
+plot(pca$x[,2], pca$x[,3],
+     col=c("blue","blue","red","red"),
+     xlab="PC2", ylab="PC3", pch=16)
+
+```
+
+```{r}
+plot(pca$x[,2], pca$x[,3],
+     col=c("blue","blue","red","red"),
+     xlab="PC2", ylab="PC3", pch=16)
+```
+
+```{r}
+library(ggplot2)
+library(ggrepel)
+
+mycols <- c("blue","blue","red","red")
+
+ggplot(pca$x) +
+  aes(PC1, PC2, label=rownames(pca$x)) +
+  geom_point(col = mycols) +
+  geom_text_repel(col = mycols) +
+  theme_bw()
+```
+
+
+```{r}
+ggplot(pca$x) +
+  aes(PC1, PC3, label=rownames(pca$x)) +
+  geom_point(col = mycols) +
+  geom_text_repel(col = mycols) +
+  theme_bw()
+```
+
+
+```{r}
+ggplot(pca$x) +
+  aes(PC2, PC3, label=rownames(pca$x)) +
+  geom_point(col = mycols) +
+  geom_text_repel(col = mycols) +
+  theme_bw()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### NOTE about graphs: lab screenshot used the full Ensembl transcriptome where i had to use the MINI transcriptome. However, the good news is that it does NOT the PCA pattern! So the pattern shoudl still be corrrect. 
+
+
+
+
