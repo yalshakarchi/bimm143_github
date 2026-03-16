@@ -21,7 +21,7 @@ Class 10 [Structural Bioinformatics](class10/class10.md)
 
 Class 11 [Alphafold](class11/class11.md)
 
-Class 12 [RNASeq Galaxy](class12/class12.qmd)
+Class 12 [RNASeq Galaxy](class12/class12.pdf)
 
 Class 13 [DESeq lab](class13/class13.md)
 
@@ -29,11 +29,11 @@ Class 14 [DESeq2 mini project](class14/class14.md)
 
 Class 16 [Unix Basics](class16_16.pdf)
 
-Class 17 [Analyzing sequencing data in the cloud](unix_notes.md)
+Class 17 [Analyzing sequencing data in the cloud](unix_notes.pdf)
 
 Class 18 [Pertussis Resurgence (mini-project)](class18/class18.md)
 
-Class 19 [Mutant Sequence Analysis](class19.md)
+Class 19 [Mutant Sequence Analysis](class19.pdf)
 
 
 
