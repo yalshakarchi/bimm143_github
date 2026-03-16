@@ -11,9 +11,9 @@ Class 05 [Data viz with ggplot](class05/class05.md)
 
 Class 06 [R Function](class06/class06.md)
 
-Class 07 [Machine Learning 1](class07/class07.md)
+Class 07 [Machine Learning 1](Class07/class07.md)
 
-Class 08 [ML Mini Project](class08/class08.md)
+Class 08 [ML Mini Project](Class08/class08.md)
 
 Class 09 [Halloween Mini Project](class09/class09.md)
 
