@@ -5,7 +5,7 @@ My classwork from [BIMM143](https://bioboot.github.io/bimm143_W26/schedule/#15) 
 
 *Introductory classes
 
-Class 04 [R Fundementals](class04/class04.md)
+Class 04 [R Fundamentals](class04/class04.qmd)
 
 Class 05 [Data viz with ggplot](class05/class05.md)
 
@@ -21,7 +21,7 @@ Class 10 [Structural Bioinformatics](class10/class10.md)
 
 Class 11 [Alphafold](class11/class11.md)
 
-Class 12 [RNASeq Galaxy](class12/class12.md)
+Class 12 [RNASeq Galaxy](class12/class12.qmd)
 
 Class 13 [DESeq lab](class13/class13.md)
 
@@ -33,6 +33,7 @@ Class 17 [Analyzing sequencing data in the cloud](unix_notes.qmd)
 
 Class 18 [Pertussis Resurgence (mini-project)](class18/class18.md)
 
+Class 19 [Mutant Sequence Analysis](class19.pdf)
 
 
 
