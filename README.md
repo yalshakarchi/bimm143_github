@@ -29,11 +29,11 @@ Class 14 [DESeq2 mini project](class14/class14.md)
 
 Class 16 [Unix Basics](class16_16.pdf)
 
-Class 17 [Analyzing sequencing data in the cloud](unix_notes.qmd)
+Class 17 [Analyzing sequencing data in the cloud](unix_notes.md)
 
 Class 18 [Pertussis Resurgence (mini-project)](class18/class18.md)
 
-Class 19 [Mutant Sequence Analysis](class19.pdf)
+Class 19 [Mutant Sequence Analysis](class19.md)
 
 
 
